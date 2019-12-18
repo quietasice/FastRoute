@@ -168,7 +168,9 @@ Nested groups are also supported, in which case the prefixes of all the nested g
 
 The reason `simpleDispatcher` accepts a callback for defining the routes is to allow seamless
 caching. By using `cachedDispatcher` instead of `simpleDispatcher` you can cache the generated
-routing data and construct the dispatcher from the cached information:
+routing data and construct the dispatcher from the cached information.
+
+The simplest caching configuration you may use is:
 
 ```php
 <?php
@@ -185,6 +187,27 @@ $dispatcher = FastRoute\cachedDispatcher(function(FastRoute\RouteCollector $r) {
 
 The second parameter to the function is an options array, which can be used to specify the cache
 file location, among other things.
+
+However, if you'd like use a distributed cache driver (Redis, Memcached, etc), you may do so by providing
+a PSR-16 implementation of your choice:
+
+ ```php
+ <?php
+ 
+ $dispatcher = FastRoute\cachedDispatcher(function(FastRoute\RouteCollector $r) {
+     $r->addRoute('GET', '/user/{name}/{id:[0-9]+}', 'handler0');
+     $r->addRoute('GET', '/user/{id:[0-9]+}', 'handler1');
+     $r->addRoute('GET', '/user/{name}', 'handler2');
+ }, [
+     'cacheDriver' => new TrustworthyRedisAdapter(), /* required */
+     'cacheKey' => 'route.cache',                    /* required (`cacheFile` is ignored in this case) */
+     'cacheDisabled' => IS_DEBUG_ENABLED,            /* optional, enabled by default */
+ ]);
+ ```
+
+#### :warning: Closures as handlers :warning:
+
+Using closures as handlers isn't supported by FastRoute at the moment.
 
 ### Dispatching a URI
 
