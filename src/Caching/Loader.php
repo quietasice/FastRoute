@@ -35,6 +35,10 @@ final class Loader
             return new self(new NullCache(), $key);
         }
 
+        if (isset($options['cacheDriver'])) {
+            return new self($options['cacheDriver'], $key);
+        }
+
         if (! isset($options['cacheFile'])) {
             throw new LogicException('Must specify "cacheFile" option');
         }

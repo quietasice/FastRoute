@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FastRoute\Test\Functional;
 
+use FastRoute\Caching\SimpleFileCache;
 use FastRoute\RouteCollector;
 use PHPUnit\Framework\TestCase;
 use function FastRoute\cachedDispatcher;
@@ -46,6 +47,20 @@ final class CachedDispatcherCreationTest extends TestCase
         cachedDispatcher($loader, self::OPTIONS);
         cachedDispatcher($loader, self::OPTIONS);
         cachedDispatcher($loader, self::OPTIONS);
+
+        self::assertSame(1, $calls);
+    }
+
+    /** @test */
+    public function customDriverCanBeSpecifiedEvenWithCustomCacheKey(): void
+    {
+        $calls   = 0;
+        $loader  = $this->createSimpleLoader($calls);
+        $options = ['cacheDriver' => new SimpleFileCache(__DIR__), 'cacheKey' => 'router.php'];
+
+        cachedDispatcher($loader, $options);
+        cachedDispatcher($loader, $options);
+        cachedDispatcher($loader, $options);
 
         self::assertSame(1, $calls);
     }
