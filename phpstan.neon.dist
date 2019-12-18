@@ -16,3 +16,11 @@ parameters:
         -
             message: '#Only numeric types are allowed in pre-increment, string given.#'
             path: 'src/DataGenerator/MarkBased.php'
+
+        # These are things dictated by PSR-16 and should be solved there
+        -
+            message: '#Method .*::.*Multiple\(\) has parameter .* with no value type specified in iterable type#'
+            path: 'src/Caching/*Cache.php'
+        -
+            message: '#Method .*::.*Multiple\(\) return type has no value type specified in iterable type#'
+            path: 'src/Caching/*Cache.php'
