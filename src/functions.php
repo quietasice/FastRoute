@@ -3,14 +3,10 @@ declare(strict_types=1);
 
 namespace FastRoute;
 
-use LogicException;
-use RuntimeException;
+use FastRoute\Caching\Loader;
 use function assert;
-use function file_exists;
-use function file_put_contents;
+use function basename;
 use function function_exists;
-use function is_array;
-use function var_export;
 
 if (! function_exists('FastRoute\simpleDispatcher')) {
     /**
@@ -47,33 +43,10 @@ if (! function_exists('FastRoute\simpleDispatcher')) {
             'cacheDisabled' => false,
         ];
 
-        if (! isset($options['cacheFile'])) {
-            throw new LogicException('Must specify "cacheFile" option');
+        if (! isset($options['cacheKey']) && isset($options['cacheFile'])) {
+            $options['cacheKey'] = basename($options['cacheFile']);
         }
 
-        if (! $options['cacheDisabled'] && file_exists($options['cacheFile'])) {
-            $dispatchData = require $options['cacheFile'];
-            if (! is_array($dispatchData)) {
-                throw new RuntimeException('Invalid cache file "' . $options['cacheFile'] . '"');
-            }
-
-            return new $options['dispatcher']($dispatchData);
-        }
-
-        $routeCollector = new $options['routeCollector'](
-            new $options['routeParser'](), new $options['dataGenerator']()
-        );
-        assert($routeCollector instanceof RouteCollector);
-        $routeDefinitionCallback($routeCollector);
-
-        $dispatchData = $routeCollector->getData();
-        if (! $options['cacheDisabled']) {
-            file_put_contents(
-                $options['cacheFile'],
-                '<?php return ' . var_export($dispatchData, true) . ';'
-            );
-        }
-
-        return new $options['dispatcher']($dispatchData);
+        return Loader::fromOptions($options)->load($options, $routeDefinitionCallback);
     }
 }
