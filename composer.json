@@ -1,5 +1,5 @@
 {
-    "name": "nikic/fast-route",
+    "name": "quietasice/fast-route",
     "description": "Fast request router for PHP",
     "keywords": [
         "routing",
@@ -31,7 +31,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.0-dev"
+            "dev-master": "v1.4"
         }
     },
     "autoload": {
